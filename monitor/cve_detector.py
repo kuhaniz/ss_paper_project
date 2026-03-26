@@ -42,8 +42,8 @@ CVE_PATTERNS = {
     
     "CVE-2019-14271": {
         "description": "Docker cp command allows arbitrary file write",
-        "patterns": ["docker cp", "arbitrary_write", "symlink"],
-        "features": ["file_changes", "tmp_files", "suspicious_commands"],
+        "patterns": ["docker cp", "arbitrary_write", "symlink", "/tmp/", "suspicious_file", "exploit", "malicious", "backdoor", ".sh", "chmod +x"],
+        "features": ["file_changes", "tmp_files", "suspicious_commands", "webshell_files"],
         "risk": "HIGH"
     },
     
