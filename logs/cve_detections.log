@@ -1,8 +1,0 @@
-2026-03-28 19:54:31,914 - CRITICAL - CRITICAL CVE detected - CVE-2021-22555: Netfilter heap out-of-bounds write causing system instability (Score: 2)
-2026-03-28 19:54:31,914 - WARNING - HIGH CVE detected - CVE-2020-14386: Kernel memory corruption leading to performance issues and DoS (Score: 2)
-2026-03-28 19:54:31,915 - WARNING - HIGH CVE detected - CVE-2022-0185: Kernel heap buffer overflow leading to DoS and performance degradation (Score: 1)
-2026-03-28 19:54:43,283 - CRITICAL - CRITICAL CVE detected - CVE-2021-22555: Netfilter heap out-of-bounds write causing system instability (Score: 2)
-2026-03-28 19:54:43,283 - WARNING - HIGH CVE detected - CVE-2020-14386: Kernel memory corruption leading to performance issues and DoS (Score: 2)
-2026-03-28 19:54:43,283 - WARNING - HIGH CVE detected - CVE-2022-0185: Kernel heap buffer overflow leading to DoS and performance degradation (Score: 1)
-2026-03-28 20:52:27,400 - CRITICAL - CRITICAL CVE detected - CVE-2021-22555: Netfilter heap out-of-bounds write causing system instability (Score: 1)
-2026-03-28 20:52:56,776 - CRITICAL - CRITICAL CVE detected - CVE-2021-22555: Netfilter heap out-of-bounds write causing system instability (Score: 1)
