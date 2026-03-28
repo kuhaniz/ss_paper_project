@@ -13,48 +13,6 @@ DETECTION_INTERVAL = 1  # Faster detection
 CVE_DETECTION_THRESHOLD = 1  # Lower threshold for better sensitivity
 
 # ==============================
-# STEP 0: Container Cleanup for Clean Training
-# ==============================
-def cleanup_container():
-    """
-    Clean up attack artifacts to establish clean baseline for training
-    """
-    print("[+] Cleaning container for clean baseline training...")
-    
-    cleanup_commands = [
-        # Remove attack artifacts from /tmp
-        f"docker exec {CONTAINER_NAME} sh -c 'rm -f /tmp/*.php /tmp/*.sh /tmp/suspicious_* /tmp/anomaly_* /tmp/exploit* /tmp/webshell* /tmp/shell* /tmp/backdoor* /tmp/inject* /tmp/eval_* /tmp/malicious* /tmp/log4j_* /tmp/payload /tmp/memory_test 2>/dev/null || true'",
-        
-        # Clear any background processes that might be running
-        f'docker exec {CONTAINER_NAME} sh -c "pkill -f \\"sleep 30\\" 2>/dev/null || true"',
-        f'docker exec {CONTAINER_NAME} sh -c "pkill -f \\"python -c\\" 2>/dev/null || true"',
-        
-        # Reset any modified files (optional - be careful with this in production)
-        f"docker exec {CONTAINER_NAME} sh -c 'find /tmp -type f -newer /proc/uptime -delete 2>/dev/null || true'"
-    ]
-    
-    for cmd in cleanup_commands:
-        try:
-            subprocess.run(cmd, shell=True, capture_output=True, check=False)
-        except Exception as e:
-            print(f"[WARNING] Cleanup command failed: {e}")
-    
-    # Verify cleanup
-    verify_cmd = f"docker exec {CONTAINER_NAME} sh -c 'ls -la /tmp/*.php /tmp/*.sh 2>/dev/null | wc -l || echo 0'"
-    result = subprocess.run(verify_cmd, shell=True, capture_output=True, text=True)
-    artifact_count = int(result.stdout.strip() or "0")
-    
-    if artifact_count == 0:
-        print("[+] Container cleanup successful - ready for clean baseline training")
-    else:
-        print(f"[WARNING] {artifact_count} artifacts still present after cleanup")
-    
-    # Give container a moment to stabilize
-    time.sleep(2)
-    
-    return artifact_count == 0
-
-# ==============================
 # STEP 1: Capture container activity (Enhanced approach)
 # ==============================
 def capture_syscalls(duration=1):
@@ -206,11 +164,6 @@ def extract_features(log):
 # ==============================
 def train_model():
     print("[+] Preparing for baseline model training...")
-    
-    # Clean the container first for proper baseline
-    cleanup_success = cleanup_container()
-    if not cleanup_success:
-        print("[WARNING] Cleanup incomplete - training may include attack artifacts")
     
     print("[+] Training baseline model on clean behavior...")
     data = []
