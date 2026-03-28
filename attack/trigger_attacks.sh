@@ -55,26 +55,26 @@ case $choice in
         echo "   This will consume available memory rapidly"
         docker exec $VICTIM_CONTAINER bash -c "
             echo 'Starting memory exhaustion attack...'
-            # Allocate memory rapidly
-            python3 -c \"
-import time
-data = []
-try:
-    for i in range(1000):
-        # Allocate 10MB chunks
-        chunk = 'x' * (10 * 1024 * 1024)
-        data.append(chunk)
-        print(f'Allocated {(i+1)*10}MB')
-        if i % 10 == 0:
-            time.sleep(1)
-except MemoryError:
-    print('Memory exhausted!')
-    time.sleep(30)
-except KeyboardInterrupt:
-    pass
-finally:
-    print('Memory attack completed')
-            \"
+            # Allocate memory rapidly using bash
+            (
+                echo 'Creating memory pressure with dd and /dev/shm...'
+                for i in {1..100}; do
+                    # Create 10MB files in memory
+                    dd if=/dev/zero of=/dev/shm/mem_attack_\$i bs=1M count=10 2>/dev/null
+                    echo \"Allocated \${i}0MB\"
+                    sleep 1
+                    # Stop if we hit memory limits
+                    if [ \$i -gt 50 ] && ! dd if=/dev/zero of=/dev/shm/mem_test bs=1M count=1 2>/dev/null; then
+                        echo 'Memory limit reached!'
+                        break
+                    fi
+                    rm -f /dev/shm/mem_test 2>/dev/null
+                done
+                sleep 30
+                # Cleanup
+                rm -f /dev/shm/mem_attack_* 2>/dev/null
+                echo 'Memory attack completed'
+            )
         " &
         ATTACK_PID=$!
         echo "   Attack running in background (PID: $ATTACK_PID)"
@@ -161,14 +161,15 @@ finally:
                 (while true; do echo > /dev/null; done) &
             done
             
-            # Memory pressure
-            python3 -c \"
-import time
-data = []
-for i in range(50):
-    data.append('x' * (5 * 1024 * 1024))  # 5MB chunks
-    time.sleep(0.5)
-\" &
+            # Memory pressure using bash
+            (
+                echo 'Creating memory pressure...'
+                for i in {1..50}; do
+                    dd if=/dev/zero of=/dev/shm/combined_mem_$i bs=1M count=5 2>/dev/null &
+                    sleep 0.5
+                done
+                wait
+            ) &
             
             # Process explosion
             for i in \$(seq 1 50); do
@@ -183,10 +184,10 @@ for i in range(50):
             
             # Cleanup
             pkill -f 'while true'
-            pkill -f 'python3'
-            pkill -f 'sleep 60' 
             pkill -f 'dd if=/dev/zero'
+            pkill -f 'sleep 60' 
             rm -rf /tmp/combined_attack
+            rm -f /dev/shm/combined_mem_* 2>/dev/null
             echo 'Combined attack completed'
         " &
         ATTACK_PID=$!
