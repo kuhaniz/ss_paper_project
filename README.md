@@ -1,9 +1,11 @@
-# Demo for ML anomaly detection
+# Demo for ML anomaly detection - SYSBENCH version
 
 ## Alert Examples
 
 ### 🚨 Critical CVE Detection Alerts
 ![Critical Alert Screenshot](alerts.png)
+
+![Sysbench performance degraded](sysbench-alert.png)
 
 *Real-time CVE correlation showing CRITICAL and HIGH severity vulnerability detection during container attack simulation.*
 
@@ -42,4 +44,16 @@ Attack Docker
 cd attack
 ./trigger_anomalies.sh
 
+```
+
+## sysbench monitoring
+```
+cd container_cggroup_escape_exploitation/attacks/case1_exception_handling
+docker compose up
+
+cd Demo/monitor
+sudo python3 ./monitor.py
+
+cd Demo/attack
+./trigger_attacks.sh
 ```
